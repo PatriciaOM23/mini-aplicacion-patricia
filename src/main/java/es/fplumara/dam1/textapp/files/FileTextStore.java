@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FileTextStore implements TextStore{
@@ -58,10 +59,21 @@ public class FileTextStore implements TextStore{
     @Override
     public String readLast(int n) {
         try(BufferedReader br = Files.newBufferedReader(path)){
-
+        List <String> text = new ArrayList<>();
+        String line;
+        // Leer todas las líneas en la lista
+         while ((line = br.readLine()) != null) {
+             text.add(line);
+         }
+         int readLines = Math.max(0,text.size() - n);
+         StringBuilder sb = new StringBuilder();
+         for(int i = readLines; i < text.size(); i++){
+             sb.append(text.get(i)).append("\n");
+         }
+         return sb.toString();
         } catch (Exception e ){
             throw new StoreException("Error al leer el archivo");
         }
-        return "";
+
     }
 }
