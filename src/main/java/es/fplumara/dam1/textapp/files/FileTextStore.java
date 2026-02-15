@@ -17,10 +17,10 @@ import java.util.List;
 
 public class FileTextStore implements TextStore{
     AppConfig appConfig;
-
-            Path path = Path.of(appConfig.getMessagesFile());
+            Path path;
     public FileTextStore(AppConfig appConfig) {
         this.appConfig = appConfig;
+        this.path = Path.of(appConfig.getMessagesFile());
     }
 
     @Override
@@ -30,6 +30,7 @@ public class FileTextStore implements TextStore{
             File file = new File(appConfig.getMessagesFile());
             if (!file.exists()) {
                 Files.createDirectories(path.getParent());
+                file.createNewFile();
             }
             String text = message.getText();
             if (text.length() > msgLength) {
@@ -37,7 +38,6 @@ public class FileTextStore implements TextStore{
             }
             Files.write(path,
                     List.of(text),
-                    StandardOpenOption.CREATE,
                     StandardOpenOption.APPEND);
         } catch (Exception e){
             throw new StoreException("Error al guardar el archivo");
@@ -65,8 +65,10 @@ public class FileTextStore implements TextStore{
          while ((line = br.readLine()) != null) {
              text.add(line);
          }
+         //si tiene más de n lineas empieza a leer por text.size - n
          int readLines = Math.max(0,text.size() - n);
          StringBuilder sb = new StringBuilder();
+         //lee a partir de readLines
          for(int i = readLines; i < text.size(); i++){
              sb.append(text.get(i)).append("\n");
          }
